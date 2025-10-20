@@ -36,41 +36,6 @@ jobs:
       - name: Publish project
         run: dotnet publish src/ColorPicker.App/ColorPicker.App.csproj -c Release -o ./publish
 
-      - name: Fix GitHub Pages paths
-        shell: pwsh
-        run: |
-          $indexHtmlPath = "./publish/wwwroot/index.html"
-          $basePath = "/color-picker/"
-
-          Write-Host "Fixing GitHub Pages paths in $indexHtmlPath"
-          Write-Host "Base path: $basePath"
-
-          # Read the index.html file
-          $content = Get-Content $indexHtmlPath -Raw
-
-          # Store original content for comparison
-          $originalContent = $content
-
-          # Fix stylesheet href attributes (but not the base href)
-          # Pattern: href="lib/... or href="css/... or href="ColorPicker...
-          $content = $content -replace 'href="(lib/|css/|ColorPicker)', "href=`"$basePath`$1"
-
-          # Fix script src attributes (but not _framework paths which are already correct)
-          # Pattern: src="js/... (for custom scripts)
-          $content = $content -replace 'src="(js/)', "src=`"$basePath`$1"
-
-          # Verify changes were made
-          if ($content -eq $originalContent) {
-              Write-Host "Warning: No path replacements were made. Check if the file format matches expectations."
-          } else {
-              Write-Host "Successfully updated paths in index.html"
-          }
-
-          # Write the updated content back
-          Set-Content $indexHtmlPath $content -NoNewline
-
-          Write-Host "GitHub Pages path fixes completed successfully"
-
       - name: Create .nojekyll file
         run: touch ./publish/wwwroot/.nojekyll
 
