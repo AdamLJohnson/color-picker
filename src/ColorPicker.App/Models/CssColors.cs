@@ -99,9 +99,7 @@ public class CssColors
     /// <returns>The HTML color code for the recommended text color.</returns>
     public string GetTextColor(Color color)
     {
-        Console.WriteLine($"GetTextColor: {ColorTranslator.ToHtml(color)}");
         var contrastRatio = CalculateContrastRatio(_whiteColor, color);
-        Console.WriteLine($"Contrast Ratio: {contrastRatio}");
         return contrastRatio < ContrastRatioThreshold
             ? ColorTranslator.ToHtml(_whiteColor)
             : ColorTranslator.ToHtml(_blackColor);
