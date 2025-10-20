@@ -1,0 +1,83 @@
+﻿@using ColorPicker.App.Services
+@using ColorPicker.App.Models
+@implements IAsyncDisposable
+@inject ColorChangeService ColorChangeService
+
+<div class="top-row ps-3 navbar navbar-dark" style="background-color: @_headerBackgroundColor;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">ColorPicker.App</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" style="@_gradientStyle" @onclick="ToggleNavMenu">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true" style="color: @_textColor;"></span>
+                <span style="color: @_textColor;">Home</span>
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string _gradientStyle = "";
+    private string _textColor = "#FFFFFF";
+    private string _headerBackgroundColor = "#3a0647";
+    private CssColors? _cssColors;
+
+    protected override void OnInitialized()
+    {
+        ColorChangeService.OnColorChanged += HandleColorChanged;
+    }
+
+    private void HandleColorChanged(object? sender, ColorChangedEventArgs e)
+    {
+        _cssColors = e.CssColors;
+        UpdateGradientStyle();
+        StateHasChanged();
+    }
+
+    private void UpdateGradientStyle()
+    {
+        if (_cssColors == null)
+            return;
+
+        // Create gradient from darkest to lightest
+        var gradientColors = new[]
+        {
+            _cssColors.MainColor80,  // Darkest
+            _cssColors.MainColor70,
+            _cssColors.MainColor60,
+            _cssColors.MainColor,
+            _cssColors.MainColor40,
+            _cssColors.MainColor30,
+            _cssColors.MainColor20,
+            _cssColors.MainColor10   // Lightest
+        };
+
+        var gradientStops = string.Join(", ", gradientColors);
+        _gradientStyle = $"background: linear-gradient(to bottom, {gradientStops});";
+
+        _headerBackgroundColor = _cssColors.MainColor60;
+        // Use the main color for text color calculation
+        //_textColor = _cssColors.TextColor;
+    }
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        ColorChangeService.OnColorChanged -= HandleColorChanged;
+        await ValueTask.CompletedTask;
+    }
+}

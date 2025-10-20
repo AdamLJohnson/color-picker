@@ -1,0 +1,165 @@
+﻿@page "/"
+@using System.Drawing
+@using ColorPicker.App.Models
+@using ColorPicker.App.Services
+@inject ColorChangeService ColorChangeService
+@inject FaviconService FaviconService
+
+<PageTitle>Color Picker - Interactive Demo</PageTitle>
+
+<div class="container-fluid py-5">
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="mb-4">🎨 Interactive Color Picker</h1>
+            <p class="lead text-muted">Select a color to see how to automatically generate color variants and ensures WCAG 2.0 contrast compliance.</p>
+        </div>
+    </div>
+
+    <!-- Color Picker Input -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <label for="colorPicker" class="form-label fw-bold">Choose a Color:</label>
+                    <div class="d-flex align-items-center gap-3">
+                        <input
+                            type="color"
+                            id="colorPicker"
+                            class="form-control form-control-lg"
+                            style="width: 100px; height: 60px; cursor: pointer; border: 2px solid #dee2e6;"
+                            value="@_selectedColorHex"
+                            @onchange="@((ChangeEventArgs e) => HandleColorChange(e))" />
+                        <div>
+                            <p class="mb-1"><strong>Selected Color:</strong></p>
+                            <p class="mb-0 font-monospace text-primary">@_selectedColorHex</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Color Display -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Main Color Display</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div
+                        class="p-5 text-center"
+                        style="background-color: @_cssColors.MainColor; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <h2 style="color: @_cssColors.TextColor; font-weight: bold; margin: 0;">
+                            Main Color
+                        </h2>
+                        <p style="color: @_cssColors.TextColor; font-size: 1.25rem; margin: 10px 0 0 0; font-family: monospace;">
+                            @_cssColors.MainColor
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Variants Grid -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h4 class="mb-4" style="color: @_cssColors.GetTextColor(_cssColors.MainColor);">Color Variants</h4>
+            <div class="row g-3">
+                @foreach (var variant in _colorVariants)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card shadow-sm h-100">
+                            <div
+                                class="card-body p-4 text-center"
+                                style="background-color: @variant.HexCode; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <h6 style="color: @variant.TextColor; font-weight: bold; margin: 0 0 15px 0;">
+                                    @variant.Label
+                                </h6>
+                                <p style="color: @variant.TextColor; font-family: monospace; font-size: 0.95rem; margin: 0;">
+                                    @variant.HexCode
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h5 class="card-title">ℹ️ About This Demo</h5>
+                    <p class="card-text mb-2">
+                        This interactive demonstration showcases the <strong>CssColors</strong> class, which provides:
+                    </p>
+                    <ul class="mb-0">
+                        <li><strong>Automatic Text Color Selection:</strong> Calculates whether black or white text provides better contrast using WCAG 2.0 standards</li>
+                        <li><strong>Color Variants:</strong> Generates 8 color variants by blending the main color with black and white at different opacity levels</li>
+                        <li><strong>Accessibility Compliance:</strong> Ensures all text meets WCAG 2.0 contrast ratio requirements for readability</li>
+                        <li><strong>Luminance Calculation:</strong> Uses precise luminance calculations to determine optimal text colors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _selectedColorHex = "#3498db";
+    private CssColors _cssColors = null!;
+    private List<ColorVariant> _colorVariants = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cssColors = new CssColors(ColorTranslator.FromHtml(_selectedColorHex));
+        ColorChangeService.NotifyColorChanged(_cssColors);
+        UpdateColorVariants();
+        await FaviconService.UpdateFaviconAsync(_selectedColorHex);
+    }
+
+    private async Task HandleColorChange(ChangeEventArgs e)
+    {
+        if (e.Value is string colorValue)
+        {
+            _selectedColorHex = colorValue;
+            _cssColors = new CssColors(ColorTranslator.FromHtml(_selectedColorHex));
+            UpdateColorVariants();
+            ColorChangeService.NotifyColorChanged(_cssColors);
+            await FaviconService.UpdateFaviconAsync(_selectedColorHex);
+        }
+    }
+
+    private void UpdateColorVariants()
+    {
+        _colorVariants = new List<ColorVariant>
+        {
+            new ColorVariant("Main Color 10", _cssColors.MainColor10, _cssColors.GetTextColor(_cssColors.MainColor10)),
+            new ColorVariant("Main Color 20", _cssColors.MainColor20, _cssColors.GetTextColor(_cssColors.MainColor20)),
+            new ColorVariant("Main Color 30", _cssColors.MainColor30, _cssColors.GetTextColor(_cssColors.MainColor30)),
+            new ColorVariant("Main Color 40", _cssColors.MainColor40, _cssColors.GetTextColor(_cssColors.MainColor40)),
+            new ColorVariant("Main Color", _cssColors.MainColor, _cssColors.GetTextColor(_cssColors.MainColor)),
+            new ColorVariant("Main Color 60", _cssColors.MainColor60, _cssColors.GetTextColor(_cssColors.MainColor60)),
+            new ColorVariant("Main Color 70", _cssColors.MainColor70, _cssColors.GetTextColor(_cssColors.MainColor70)),
+            new ColorVariant("Main Color 80", _cssColors.MainColor80, _cssColors.GetTextColor(_cssColors.MainColor80)),
+        };
+    }
+
+    private class ColorVariant
+    {
+        public string Label { get; }
+        public string HexCode { get; }
+        public string TextColor { get; }
+
+        public ColorVariant(string label, string hexCode, string textColor)
+        {
+            Label = label;
+            HexCode = hexCode;
+            TextColor = textColor;
+        }
+    }
+}
