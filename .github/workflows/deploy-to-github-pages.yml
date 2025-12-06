@@ -3,6 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'src/ColorPicker.App/**'
+      - '*.sln'
   workflow_dispatch:
 
 permissions:
