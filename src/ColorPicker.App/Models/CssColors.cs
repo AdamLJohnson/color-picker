@@ -9,16 +9,16 @@ namespace ColorPicker.App.Models;
 public class CssColors
 {
     // Luminance calculation constants (WCAG 2.0 standard)
-    private const double RedLuminanceWeight = 0.2126;
-    private const double GreenLuminanceWeight = 0.7152;
-    private const double BlueLuminanceWeight = 0.0722;
-    private const double LuminanceThreshold = 0.03928;
-    private const double LuminanceDivisor = 12.92;
-    private const double LuminanceOffset = 0.055;
-    private const double LuminanceGamma = 1.055;
-    private const double LuminanceExponent = 2.4;
-    private const double ContrastRatioThreshold = 2.0 / 9.0;
-    private const double LuminanceAdjustment = 0.05;
+    private const double _redLuminanceWeight = 0.2126;
+    private const double _greenLuminanceWeight = 0.7152;
+    private const double _blueLuminanceWeight = 0.0722;
+    private const double _luminanceThreshold = 0.03928;
+    private const double _luminanceDivisor = 12.92;
+    private const double _luminanceOffset = 0.055;
+    private const double _luminanceGamma = 1.055;
+    private const double _luminanceExponent = 2.4;
+    private const double _contrastRatioThreshold = 2.0 / 9.0;
+    private const double _luminanceAdjustment = 0.05;
 
     private Color _mainColor;
     private readonly Color _blackColor = ColorTranslator.FromHtml("#000000");
@@ -100,7 +100,7 @@ public class CssColors
     public string GetTextColor(Color color)
     {
         var contrastRatio = CalculateContrastRatio(_whiteColor, color);
-        return contrastRatio < ContrastRatioThreshold
+        return contrastRatio < _contrastRatioThreshold
             ? ColorTranslator.ToHtml(_whiteColor)
             : ColorTranslator.ToHtml(_blackColor);
     }
@@ -123,7 +123,7 @@ public class CssColors
     public string GetSecondaryTextColor(Color color)
     {
         var contrastRatio = CalculateContrastRatio(_whiteColor, color);
-        return contrastRatio < ContrastRatioThreshold
+        return contrastRatio < _contrastRatioThreshold
             ? ColorTranslator.ToHtml(color)
             : ColorTranslator.ToHtml(_blackColor);
     }
@@ -183,7 +183,7 @@ public class CssColors
         var lighterLuminance = Math.Min(luminance1, luminance2);
         var darkerLuminance = Math.Max(luminance1, luminance2);
 
-        return (lighterLuminance + LuminanceAdjustment) / (darkerLuminance + LuminanceAdjustment);
+        return (lighterLuminance + _luminanceAdjustment) / (darkerLuminance + _luminanceAdjustment);
     }
 
     /// <summary>
@@ -197,9 +197,9 @@ public class CssColors
         var greenLuminance = CalculateComponentLuminance(color.G);
         var blueLuminance = CalculateComponentLuminance(color.B);
 
-        return (RedLuminanceWeight * redLuminance)
-            + (GreenLuminanceWeight * greenLuminance)
-            + (BlueLuminanceWeight * blueLuminance);
+        return (_redLuminanceWeight * redLuminance)
+            + (_greenLuminanceWeight * greenLuminance)
+            + (_blueLuminanceWeight * blueLuminance);
     }
 
     /// <summary>
@@ -211,11 +211,11 @@ public class CssColors
     {
         var normalizedValue = componentValue / 255.0;
 
-        if (normalizedValue <= LuminanceThreshold)
+        if (normalizedValue <= _luminanceThreshold)
         {
-            return normalizedValue / LuminanceDivisor;
+            return normalizedValue / _luminanceDivisor;
         }
 
-        return Math.Pow((normalizedValue + LuminanceOffset) / LuminanceGamma, LuminanceExponent);
+        return Math.Pow((normalizedValue + _luminanceOffset) / _luminanceGamma, _luminanceExponent);
     }
 }
