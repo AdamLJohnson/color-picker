@@ -2,6 +2,8 @@
 
 An interactive color picker web application built with Blazor WebAssembly that demonstrates WCAG 2.0 compliant color contrast calculations and automatic color variant generation.
 
+🔗 **[Try the Live Demo](https://adamljohnson.github.io/color-picker/)**
+
 ## ✨ Features
 
 - **Interactive Color Selection**: Native HTML5 color picker for seamless color selection
