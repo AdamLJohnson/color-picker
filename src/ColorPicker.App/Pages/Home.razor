@@ -54,6 +54,7 @@
                             Main Color
                         </h2>
                         <p style="color: @_cssColors.TextColor; font-size: 1.25rem; margin: 10px 0 0 0; font-family: monospace;">
+                            @ColorNamer.ClosestSystemDrawingColorName(_cssColors.MainColor)<br />
                             @_cssColors.MainColor
                         </p>
                     </div>
@@ -78,6 +79,7 @@
                                     @variant.Label
                                 </h6>
                                 <p style="color: @variant.TextColor; font-family: monospace; font-size: 0.95rem; margin: 0;">
+                                    @ColorNamer.ClosestSystemDrawingColorName(variant.HexCode)<br />
                                     @variant.HexCode
                                 </p>
                             </div>
@@ -110,7 +112,7 @@
 </div>
 
 @code {
-    private string _selectedColorHex = "#3498db";
+    private string _selectedColorHex = "#2078b3";
     private CssColors _cssColors = null!;
     private List<ColorVariant> _colorVariants = new();
 
